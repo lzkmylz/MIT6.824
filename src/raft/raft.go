@@ -1,22 +1,5 @@
 package raft
 
-//
-// this is an outline of the API that raft must expose to
-// the service (or tester). see comments below for
-// each of these functions for more details.
-//
-// rf = Make(...)
-//   create a new Raft server.
-// rf.Start(command interface{}) (index, term, isleader)
-//   start agreement on a new log entry
-// rf.GetState() (term, isLeader)
-//   ask a Raft for its current term, and whether it thinks it is leader
-// ApplyMsg
-//   each time a new entry is committed to the log, each Raft peer
-//   should send an ApplyMsg to the service (or tester)
-//   in the same server.
-//
-
 import (
 	"math/rand"
 	"sync"
@@ -263,10 +246,13 @@ func (rf *Raft) sendHeartBeat(server int) {
 	args.LeaderID = rf.me
 	args.PrevLogIndex = rf.lastLogIndex
 	args.Term = rf.currentTerm
+	// if not record follower's last log info,
+	// send empty heartbeat to test
+
 	DPrintf("server%d send heartbeat to server%d", rf.me, server)
 	ok := rf.peers[server].Call("Raft.AppendEntries", &args, &reply)
 	if ok {
-		// hearbeat failed, revert to follower
+		// hearbeat failed because of term, revert to follower
 		if !reply.Success && rf.currentTerm < reply.Term {
 			rf.resetToFollower(reply.Term)
 			return
@@ -289,12 +275,25 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	isLeader := true
 
 	// Your code here (2B).
+	index = rf.lastLogIndex + 1
+	term = rf.currentTerm
+	log := ApplyMsg{
+		Command:      command,
+		CommandIndex: index,
+		CommandTerm:  term,
+		CommandValid: true,
+	}
+	rf.mu.Lock()
+	rf.log = append(rf.log, log)
+	rf.lastLogIndex = index
+	rf.lastLogTerm = term
+	rf.mu.Unlock()
 
 	return index, term, isLeader
 }
 
 //
-// the tester doesn't halt goroutines created by Raft after each test,
+// Kill the tester doesn't halt goroutines created by Raft after each test,
 // but it does call the Kill() method. your code can use killed() to
 // check whether Kill() has been called. the use of atomic avoids the
 // need for a lock.
@@ -315,7 +314,7 @@ func (rf *Raft) killed() bool {
 }
 
 //
-// the service or tester wants to create a Raft server. the ports
+// Make the service or tester wants to create a Raft server. the ports
 // of all the Raft servers (including this one) are in peers[]. this
 // server's port is peers[me]. all the servers' peers[] arrays
 // have the same order. persister is a place for this server to

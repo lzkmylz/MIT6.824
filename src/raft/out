@@ -1,6 +1,6 @@
 Test (2A): initial election ...
-warning: term changed even though there were no failures  ... Passed --   3.0  3   72   18030    0
+  ... Passed --   3.1  3   36   10584    0
 Test (2A): election after network failure ...
-  ... Passed --   4.4  3  140   26179    0
+  ... Passed --   4.6  3  104   19748    0
 PASS
-ok  	_/Users/zhaolin/Documents/MIT6d824/6.824/src/raft	7.476s
+ok  	_/Users/zhaolin/Documents/MIT6d824/6.824/src/raft	7.685s
