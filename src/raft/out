@@ -1,6 +1,486 @@
 Test (2A): initial election ...
-  ... Passed --   3.1  3   36   10584    0
+2020/03/07 19:59:02 server1 become candidate, term 1
+2020/03/07 19:59:02 server1 request server 2 to vote, term 1
+2020/03/07 19:59:02 server1 request server 0 to vote, term 1
+2020/03/07 19:59:02 server0 vote to server 1, term 1
+2020/03/07 19:59:02 server2 vote to server 1, term 1
+2020/03/07 19:59:02 server1 get vote from server 0, term 1
+2020/03/07 19:59:02 server1 become leader, term 1
+2020/03/07 19:59:02 server1 heartbeat, term 1
+2020/03/07 19:59:02 server1 send heartbeat to server2
+2020/03/07 19:59:02 server1 get vote from server 2, term 1
+2020/03/07 19:59:02 server1 send heartbeat to server0
+2020/03/07 19:59:02 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:02 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:02 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:02 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:02 server1 heartbeat, term 1
+2020/03/07 19:59:02 server1 send heartbeat to server2
+2020/03/07 19:59:02 server1 send heartbeat to server0
+2020/03/07 19:59:02 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:02 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:02 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:02 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:02 server1 heartbeat, term 1
+2020/03/07 19:59:02 server1 send heartbeat to server2
+2020/03/07 19:59:02 server1 send heartbeat to server0
+2020/03/07 19:59:02 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:02 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:02 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:02 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:02 server1 heartbeat, term 1
+2020/03/07 19:59:02 server1 send heartbeat to server2
+2020/03/07 19:59:02 server1 send heartbeat to server0
+2020/03/07 19:59:02 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:02 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:02 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:02 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server1 heartbeat, term 1
+2020/03/07 19:59:03 server1 send heartbeat to server2
+2020/03/07 19:59:03 server1 send heartbeat to server0
+2020/03/07 19:59:03 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server1 heartbeat, term 1
+2020/03/07 19:59:03 server1 send heartbeat to server2
+2020/03/07 19:59:03 server1 send heartbeat to server0
+2020/03/07 19:59:03 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server1 heartbeat, term 1
+2020/03/07 19:59:03 server1 send heartbeat to server2
+2020/03/07 19:59:03 server1 send heartbeat to server0
+2020/03/07 19:59:03 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server1 heartbeat, term 1
+2020/03/07 19:59:03 server1 send heartbeat to server0
+2020/03/07 19:59:03 server1 send heartbeat to server2
+2020/03/07 19:59:03 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server1 heartbeat, term 1
+2020/03/07 19:59:03 server1 send heartbeat to server2
+2020/03/07 19:59:03 server1 send heartbeat to server0
+2020/03/07 19:59:03 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:03 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:03 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:04 server1 heartbeat, term 1
+2020/03/07 19:59:04 server1 send heartbeat to server2
+2020/03/07 19:59:04 server1 send heartbeat to server0
+2020/03/07 19:59:04 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:04 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:04 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:04 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:04 server1 heartbeat, term 1
+2020/03/07 19:59:04 server1 send heartbeat to server0
+2020/03/07 19:59:04 server1 send heartbeat to server2
+2020/03/07 19:59:04 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:04 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:04 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:04 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:04 server1 heartbeat, term 1
+2020/03/07 19:59:04 server1 send heartbeat to server2
+2020/03/07 19:59:04 server1 send heartbeat to server0
+2020/03/07 19:59:04 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:04 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:04 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:04 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:04 server1 heartbeat, term 1
+2020/03/07 19:59:04 server1 send heartbeat to server2
+2020/03/07 19:59:04 server1 send heartbeat to server0
+2020/03/07 19:59:04 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:04 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:04 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:04 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:05 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:05 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:05 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:05 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+  ... Passed --   3.1  3   30    8804    0
 Test (2A): election after network failure ...
-  ... Passed --   4.6  3  104   19748    0
+2020/03/07 19:59:05 server1 become candidate, term 1
+2020/03/07 19:59:05 server1 request server 2 to vote, term 1
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 request server 0 to vote, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:05 server2 vote to server 1, term 1
+2020/03/07 19:59:05 server1 get vote from server 2, term 1
+2020/03/07 19:59:05 server0 vote to server 1, term 1
+2020/03/07 19:59:05 server1 become leader, term 1
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:05 server1 get vote from server 0, term 1
+2020/03/07 19:59:05 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:05 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:05 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:05 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:05 server0 become candidate, term 2
+2020/03/07 19:59:05 server2 become candidate, term 2
+2020/03/07 19:59:05 server2 request server 1 to vote, term 2
+2020/03/07 19:59:05 server0 request server 2 to vote, term 2
+2020/03/07 19:59:05 server0 request server 1 to vote, term 2
+2020/03/07 19:59:05 server2 request server 0 to vote, term 2
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:05 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:05 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:05 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
+2020/03/07 19:59:05 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server0 become candidate, term 3
+2020/03/07 19:59:05 server0 request server 2 to vote, term 3
+2020/03/07 19:59:05 server0 request server 1 to vote, term 3
+2020/03/07 19:59:05 server2 become candidate, term 3
+2020/03/07 19:59:05 server2 request server 1 to vote, term 3
+2020/03/07 19:59:05 server2 request server 0 to vote, term 3
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:05 server0 become candidate, term 2
+2020/03/07 19:59:05 server0 request server 2 to vote, term 2
+2020/03/07 19:59:05 server0 request server 1 to vote, term 2
+2020/03/07 19:59:05 server2 vote to server 0, term 2
+2020/03/07 19:59:05 server0 get vote from server 2, term 2
+2020/03/07 19:59:05 server0 become leader, term 2
+2020/03/07 19:59:05 server0 heartbeat, term 2
+2020/03/07 19:59:05 server0 send heartbeat to server2
+2020/03/07 19:59:05 server0 send heartbeat to server1
+2020/03/07 19:59:05 server2 get heartbeat from server0, leader term 2, self term 2, is empty heartbeat: true
+2020/03/07 19:59:05 server2 sync with leader server0, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:05 server0 heartbeat, term 2
+2020/03/07 19:59:05 server0 send heartbeat to server2
+2020/03/07 19:59:05 server0 become candidate, term 4
+2020/03/07 19:59:05 server0 request server 2 to vote, term 4
+2020/03/07 19:59:05 server0 send heartbeat to server1
+2020/03/07 19:59:05 server0 request server 1 to vote, term 4
+2020/03/07 19:59:05 server2 get heartbeat from server0, leader term 2, self term 2, is empty heartbeat: true
+2020/03/07 19:59:05 server2 sync with leader server0, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:05 server2 become candidate, term 4
+2020/03/07 19:59:05 server2 request server 1 to vote, term 4
+2020/03/07 19:59:05 server2 request server 0 to vote, term 4
+2020/03/07 19:59:05 server1 heartbeat, term 1
+2020/03/07 19:59:05 server1 send heartbeat to server2
+2020/03/07 19:59:05 server1 send heartbeat to server0
+2020/03/07 19:59:06 server1 heartbeat, term 1
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server0 heartbeat, term 2
+2020/03/07 19:59:06 server0 send heartbeat to server1
+2020/03/07 19:59:06 server0 send heartbeat to server2
+2020/03/07 19:59:06 server1 get heartbeat from server0, leader term 2, self term 1, is empty heartbeat: true
+2020/03/07 19:59:06 server1 sync with leader server0, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:06 server2 get heartbeat from server0, leader term 2, self term 2, is empty heartbeat: true
+2020/03/07 19:59:06 server2 sync with leader server0, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:06 server0 become candidate, term 5
+2020/03/07 19:59:06 server0 request server 2 to vote, term 5
+2020/03/07 19:59:06 server1 heartbeat, term 1
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server0 request server 1 to vote, term 5
+2020/03/07 19:59:06 server2 become candidate, term 5
+2020/03/07 19:59:06 server2 request server 1 to vote, term 5
+2020/03/07 19:59:06 server2 request server 0 to vote, term 5
+2020/03/07 19:59:06 server1 become candidate, term 3
+2020/03/07 19:59:06 server1 request server 2 to vote, term 3
+2020/03/07 19:59:06 server1 request server 0 to vote, term 3
+2020/03/07 19:59:06 server2 vote to server 1, term 3
+2020/03/07 19:59:06 server0 vote to server 1, term 3
+2020/03/07 19:59:06 server1 get vote from server 2, term 3
+2020/03/07 19:59:06 server1 become leader, term 3
+2020/03/07 19:59:06 server1 heartbeat, term 3
+2020/03/07 19:59:06 server1 get vote from server 0, term 3
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server2 get heartbeat from server1, leader term 3, self term 3, is empty heartbeat: true
+2020/03/07 19:59:06 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:06 server0 get heartbeat from server1, leader term 3, self term 3, is empty heartbeat: true
+2020/03/07 19:59:06 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:06 server1 heartbeat, term 1
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server0 become candidate, term 6
+2020/03/07 19:59:06 server0 request server 2 to vote, term 6
+2020/03/07 19:59:06 server0 request server 1 to vote, term 6
+2020/03/07 19:59:06 server2 become candidate, term 6
+2020/03/07 19:59:06 server2 request server 1 to vote, term 6
+2020/03/07 19:59:06 server2 request server 0 to vote, term 6
+2020/03/07 19:59:06 server1 heartbeat, term 3
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server2 get heartbeat from server1, leader term 3, self term 3, is empty heartbeat: true
+2020/03/07 19:59:06 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:06 server0 get heartbeat from server1, leader term 3, self term 3, is empty heartbeat: true
+2020/03/07 19:59:06 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:06 server1 heartbeat, term 1
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server1 heartbeat, term 3
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server0 become candidate, term 4
+2020/03/07 19:59:06 server0 request server 2 to vote, term 4
+2020/03/07 19:59:06 server0 request server 1 to vote, term 4
+2020/03/07 19:59:06 server2 become candidate, term 4
+2020/03/07 19:59:06 server2 request server 1 to vote, term 4
+2020/03/07 19:59:06 server0 become candidate, term 7
+2020/03/07 19:59:06 server0 request server 2 to vote, term 7
+2020/03/07 19:59:06 server2 request server 0 to vote, term 4
+2020/03/07 19:59:06 server0 request server 1 to vote, term 7
+2020/03/07 19:59:06 server2 become candidate, term 7
+2020/03/07 19:59:06 server2 request server 1 to vote, term 7
+2020/03/07 19:59:06 server2 request server 0 to vote, term 7
+2020/03/07 19:59:06 server1 heartbeat, term 1
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server1 heartbeat, term 3
+2020/03/07 19:59:06 server1 send heartbeat to server2
+2020/03/07 19:59:06 server1 send heartbeat to server0
+2020/03/07 19:59:06 server0 become candidate, term 5
+2020/03/07 19:59:06 server0 request server 2 to vote, term 5
+2020/03/07 19:59:06 server0 request server 1 to vote, term 5
+2020/03/07 19:59:06 server2 become candidate, term 5
+2020/03/07 19:59:06 server2 request server 1 to vote, term 5
+2020/03/07 19:59:06 server2 request server 0 to vote, term 5
+2020/03/07 19:59:06 server0 become candidate, term 8
+2020/03/07 19:59:06 server0 request server 2 to vote, term 8
+2020/03/07 19:59:06 server0 request server 1 to vote, term 8
+2020/03/07 19:59:07 server1 heartbeat, term 3
+2020/03/07 19:59:07 server1 heartbeat, term 1
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server2 become candidate, term 8
+2020/03/07 19:59:07 server2 request server 1 to vote, term 8
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server2 request server 0 to vote, term 8
+2020/03/07 19:59:07 server0 become candidate, term 6
+2020/03/07 19:59:07 server0 request server 2 to vote, term 6
+2020/03/07 19:59:07 server0 request server 1 to vote, term 6
+2020/03/07 19:59:07 server1 heartbeat, term 3
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server2 become candidate, term 6
+2020/03/07 19:59:07 server2 request server 1 to vote, term 6
+2020/03/07 19:59:07 server2 request server 0 to vote, term 6
+2020/03/07 19:59:07 server1 heartbeat, term 1
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server0 become candidate, term 9
+2020/03/07 19:59:07 server0 request server 2 to vote, term 9
+2020/03/07 19:59:07 server0 request server 1 to vote, term 9
+2020/03/07 19:59:07 server2 become candidate, term 9
+2020/03/07 19:59:07 server2 request server 1 to vote, term 9
+2020/03/07 19:59:07 server2 request server 0 to vote, term 9
+2020/03/07 19:59:07 server0 become candidate, term 7
+2020/03/07 19:59:07 server0 request server 2 to vote, term 7
+2020/03/07 19:59:07 server0 request server 1 to vote, term 7
+2020/03/07 19:59:07 server1 heartbeat, term 3
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server2 become candidate, term 7
+2020/03/07 19:59:07 server2 request server 1 to vote, term 7
+2020/03/07 19:59:07 server2 request server 0 to vote, term 7
+2020/03/07 19:59:07 server1 heartbeat, term 1
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server0 become candidate, term 8
+2020/03/07 19:59:07 server0 request server 2 to vote, term 8
+2020/03/07 19:59:07 server0 request server 1 to vote, term 8
+2020/03/07 19:59:07 server0 become candidate, term 10
+2020/03/07 19:59:07 server0 request server 2 to vote, term 10
+2020/03/07 19:59:07 server0 request server 1 to vote, term 10
+2020/03/07 19:59:07 server2 become candidate, term 10
+2020/03/07 19:59:07 server2 request server 1 to vote, term 10
+2020/03/07 19:59:07 server1 heartbeat, term 3
+2020/03/07 19:59:07 server2 request server 0 to vote, term 10
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 heartbeat, term 1
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server2 become candidate, term 8
+2020/03/07 19:59:07 server2 request server 1 to vote, term 8
+2020/03/07 19:59:07 server2 request server 0 to vote, term 8
+2020/03/07 19:59:07 server0 become candidate, term 9
+2020/03/07 19:59:07 server0 request server 2 to vote, term 9
+2020/03/07 19:59:07 server0 request server 1 to vote, term 9
+2020/03/07 19:59:07 server1 heartbeat, term 3
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server0 become candidate, term 11
+2020/03/07 19:59:07 server0 request server 2 to vote, term 11
+2020/03/07 19:59:07 server0 request server 1 to vote, term 11
+2020/03/07 19:59:07 server2 become candidate, term 11
+2020/03/07 19:59:07 server2 request server 1 to vote, term 11
+2020/03/07 19:59:07 server2 request server 0 to vote, term 11
+2020/03/07 19:59:07 server1 heartbeat, term 1
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server1 heartbeat, term 3
+2020/03/07 19:59:07 server1 send heartbeat to server2
+2020/03/07 19:59:07 server1 send heartbeat to server0
+2020/03/07 19:59:07 server2 become candidate, term 9
+2020/03/07 19:59:07 server2 request server 0 to vote, term 9
+2020/03/07 19:59:07 server2 request server 1 to vote, term 9
+2020/03/07 19:59:07 server0 become candidate, term 10
+2020/03/07 19:59:07 server0 request server 2 to vote, term 10
+2020/03/07 19:59:07 server0 request server 1 to vote, term 10
+2020/03/07 19:59:08 server0 become candidate, term 12
+2020/03/07 19:59:08 server0 request server 2 to vote, term 12
+2020/03/07 19:59:08 server0 request server 1 to vote, term 12
+2020/03/07 19:59:08 server1 heartbeat, term 1
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server1 heartbeat, term 3
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server2 become candidate, term 12
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server2 request server 0 to vote, term 12
+2020/03/07 19:59:08 server2 request server 1 to vote, term 12
+2020/03/07 19:59:08 server0 become candidate, term 11
+2020/03/07 19:59:08 server0 request server 2 to vote, term 11
+2020/03/07 19:59:08 server0 request server 1 to vote, term 11
+2020/03/07 19:59:08 server2 become candidate, term 10
+2020/03/07 19:59:08 server2 request server 1 to vote, term 10
+2020/03/07 19:59:08 server2 request server 0 to vote, term 10
+2020/03/07 19:59:08 server1 heartbeat, term 1
+2020/03/07 19:59:08 server1 heartbeat, term 3
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server0 become candidate, term 13
+2020/03/07 19:59:08 server0 request server 2 to vote, term 13
+2020/03/07 19:59:08 server0 request server 1 to vote, term 13
+2020/03/07 19:59:08 server0 become candidate, term 12
+2020/03/07 19:59:08 server0 request server 2 to vote, term 12
+2020/03/07 19:59:08 server0 request server 1 to vote, term 12
+2020/03/07 19:59:08 server2 become candidate, term 13
+2020/03/07 19:59:08 server2 request server 1 to vote, term 13
+2020/03/07 19:59:08 server2 request server 0 to vote, term 13
+2020/03/07 19:59:08 server2 become candidate, term 11
+2020/03/07 19:59:08 server2 request server 1 to vote, term 11
+2020/03/07 19:59:08 server2 request server 0 to vote, term 11
+2020/03/07 19:59:08 server1 heartbeat, term 3
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server1 heartbeat, term 1
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server0 become candidate, term 13
+2020/03/07 19:59:08 server0 request server 2 to vote, term 13
+2020/03/07 19:59:08 server0 request server 1 to vote, term 13
+2020/03/07 19:59:08 server0 become candidate, term 14
+2020/03/07 19:59:08 server0 request server 2 to vote, term 14
+2020/03/07 19:59:08 server0 request server 1 to vote, term 14
+2020/03/07 19:59:08 server2 become candidate, term 14
+2020/03/07 19:59:08 server2 request server 1 to vote, term 14
+2020/03/07 19:59:08 server2 request server 0 to vote, term 14
+2020/03/07 19:59:08 server1 heartbeat, term 3
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server2 become candidate, term 12
+2020/03/07 19:59:08 server2 request server 1 to vote, term 12
+2020/03/07 19:59:08 server2 request server 0 to vote, term 12
+2020/03/07 19:59:08 server1 heartbeat, term 1
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server1 heartbeat, term 3
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:08 server0 become candidate, term 15
+2020/03/07 19:59:08 server0 request server 2 to vote, term 15
+2020/03/07 19:59:08 server0 request server 1 to vote, term 15
+2020/03/07 19:59:08 server0 become candidate, term 14
+2020/03/07 19:59:08 server0 request server 2 to vote, term 14
+2020/03/07 19:59:08 server0 request server 1 to vote, term 14
+2020/03/07 19:59:08 server2 vote to server 0, term 14
+2020/03/07 19:59:08 server0 get vote from server 2, term 14
+2020/03/07 19:59:08 server0 become leader, term 14
+2020/03/07 19:59:08 server0 heartbeat, term 14
+2020/03/07 19:59:08 server0 send heartbeat to server2
+2020/03/07 19:59:08 server0 send heartbeat to server1
+2020/03/07 19:59:08 server2 get heartbeat from server0, leader term 14, self term 14, is empty heartbeat: true
+2020/03/07 19:59:08 server2 sync with leader server0, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:08 server2 become candidate, term 15
+2020/03/07 19:59:08 server2 request server 1 to vote, term 15
+2020/03/07 19:59:08 server2 request server 0 to vote, term 15
+2020/03/07 19:59:08 server1 heartbeat, term 1
+2020/03/07 19:59:08 server1 send heartbeat to server2
+2020/03/07 19:59:08 server1 send heartbeat to server0
+2020/03/07 19:59:09 server1 heartbeat, term 3
+2020/03/07 19:59:09 server1 send heartbeat to server2
+2020/03/07 19:59:09 server1 send heartbeat to server0
+2020/03/07 19:59:09 server0 heartbeat, term 14
+2020/03/07 19:59:09 server0 send heartbeat to server2
+2020/03/07 19:59:09 server0 send heartbeat to server1
+2020/03/07 19:59:09 server2 get heartbeat from server0, leader term 14, self term 14, is empty heartbeat: true
+2020/03/07 19:59:09 server1 get heartbeat from server0, leader term 14, self term 3, is empty heartbeat: true
+2020/03/07 19:59:09 server1 sync with leader server0, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:09 server2 sync with leader server0, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:09 server0 become candidate, term 16
+2020/03/07 19:59:09 server0 request server 2 to vote, term 16
+2020/03/07 19:59:09 server0 request server 1 to vote, term 16
+2020/03/07 19:59:09 server1 heartbeat, term 1
+2020/03/07 19:59:09 server1 send heartbeat to server2
+2020/03/07 19:59:09 server1 send heartbeat to server0
+2020/03/07 19:59:09 server2 become candidate, term 16
+2020/03/07 19:59:09 server2 request server 1 to vote, term 16
+2020/03/07 19:59:09 server2 request server 0 to vote, term 16
+2020/03/07 19:59:09 server1 become candidate, term 15
+2020/03/07 19:59:09 server1 request server 2 to vote, term 15
+2020/03/07 19:59:09 server1 request server 0 to vote, term 15
+2020/03/07 19:59:09 server2 vote to server 1, term 15
+2020/03/07 19:59:09 server0 vote to server 1, term 15
+2020/03/07 19:59:09 server1 get vote from server 0, term 15
+2020/03/07 19:59:09 server1 become leader, term 15
+2020/03/07 19:59:09 server1 heartbeat, term 15
+2020/03/07 19:59:09 server1 send heartbeat to server2
+2020/03/07 19:59:09 server1 get vote from server 2, term 15
+2020/03/07 19:59:09 server1 send heartbeat to server0
+2020/03/07 19:59:09 server2 get heartbeat from server1, leader term 15, self term 15, is empty heartbeat: true
+2020/03/07 19:59:09 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:09 server0 get heartbeat from server1, leader term 15, self term 15, is empty heartbeat: true
+2020/03/07 19:59:09 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:09 server1 heartbeat, term 1
+2020/03/07 19:59:09 server1 send heartbeat to server2
+2020/03/07 19:59:09 server1 send heartbeat to server0
+2020/03/07 19:59:09 server0 become candidate, term 17
+2020/03/07 19:59:09 server0 request server 2 to vote, term 17
+2020/03/07 19:59:09 server0 request server 1 to vote, term 17
+2020/03/07 19:59:09 server1 heartbeat, term 15
+2020/03/07 19:59:09 server1 send heartbeat to server2
+2020/03/07 19:59:09 server1 send heartbeat to server0
+2020/03/07 19:59:09 server0 get heartbeat from server1, leader term 15, self term 15, is empty heartbeat: true
+2020/03/07 19:59:09 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:09 server2 get heartbeat from server1, leader term 15, self term 15, is empty heartbeat: true
+2020/03/07 19:59:09 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true
+2020/03/07 19:59:09 server2 become candidate, term 17
+2020/03/07 19:59:09 server2 request server 1 to vote, term 17
+2020/03/07 19:59:09 server2 request server 0 to vote, term 17
+2020/03/07 19:59:09 server1 heartbeat, term 1
+2020/03/07 19:59:09 server1 send heartbeat to server2
+2020/03/07 19:59:09 server1 send heartbeat to server0
+  ... Passed --   4.6  3  104   19788    0
 PASS
-ok  	_/Users/zhaolin/Documents/MIT6d824/6.824/src/raft	7.685s
+ok  	_/Users/zhaolin/Documents/MIT6d824/6.824/src/raft	7.683s
