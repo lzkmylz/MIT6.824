@@ -553,7 +553,7 @@ func (rf *Raft) voteToOther(server, newTerm int) {
 func (rf *Raft) logInconsistencies(server, lastHBTerm int) {
 	DPrintf("leader%d try consistence with server%d, lastHBTerm %d",
 		rf.me, server, lastHBTerm)
-	for i := len(rf.log) - 1; i >= 0; i-- {
+	for i := 0; i < len(rf.log); i++ {
 		if rf.log[i].CommandTerm == lastHBTerm-1 {
 			rf.mu.Lock()
 			rf.nextIndex[server] = i + 1
@@ -564,6 +564,9 @@ func (rf *Raft) logInconsistencies(server, lastHBTerm int) {
 
 func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries []ApplyMsg) bool {
 	checkResult := false
+	DPrintf(`server%d sync with leader function, leaderCommit %d, checkIndex %d,
+	checkTerm %d, entries length %d`,
+		rf.me, leaderCommit, checkIndex, checkTerm, len(entries))
 	if checkTerm > rf.lastLogTerm || checkIndex > rf.lastLogIndex {
 		return checkResult
 	}
@@ -574,36 +577,48 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 	if checkResult {
 		rf.mu.Lock()
 		// find a match point
-		DPrintf(`server%d sync with leader function, leaderCommit %d, checkIndex %d,
-		checkTerm %d, entries length %d`,
-			rf.me, leaderCommit, checkIndex, checkTerm, len(entries))
-		if len(entries) > 0 && entries[0].CommandIndex == rf.lastLogIndex+1 {
-			for i := 0; i < len(entries); i++ {
-				rf.log = append(rf.log, entries[i])
+		if len(entries) > 0 {
+			copyStartPoint := entries[0].CommandIndex
+			copyEndPoint := rf.lastLogIndex
+
+			if copyStartPoint > rf.lastLogIndex {
+				for _, v := range entries {
+					rf.log = append(rf.log, v)
+				}
+			} else {
+				for k, v := range entries {
+					if v.CommandIndex <= copyEndPoint {
+						rf.log[copyStartPoint+k] = v
+					} else {
+						rf.log = append(rf.log, v)
+					}
+				}
 			}
-		} else if len(entries) > 0 {
-			var checkPoint int
+		}
+		/*
+			entriesStartPoint := entries[0]
+			checkPoint := -1
 			for k, v := range entries {
-				if v.CommandIndex == rf.lastLogTerm && v.CommandTerm == rf.lastLogTerm {
+				if v.CommandIndex == rf.lastLogIndex+1 {
 					checkPoint = k
 					break
 				}
 			}
-			for i := checkPoint + 1; i < len(entries); i++ {
-				rf.log = append(rf.log, entries[i])
+			if checkPoint >= 0 {
+				for i := checkPoint; i < len(entries); i++ {
+					rf.log = append(rf.log, entries[i])
+				}
 			}
-		}
+		*/
 
 		rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
 		rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
-		if rf.lastLogIndex <= leaderCommit {
-			for i := rf.lastApplied + 1; i <= rf.lastLogIndex; i++ {
-				DPrintf("server %d apply log %d", rf.me, i)
-				rf.applyChan <- rf.log[i]
-				rf.lastApplied = i
-			}
-		}
 		rf.commitIndex = leaderCommit
+		if rf.lastApplied+1 <= leaderCommit && rf.lastApplied+1 <= rf.lastLogIndex {
+			rf.applyChan <- rf.log[rf.lastApplied+1]
+			rf.lastApplied = rf.lastApplied + 1
+			DPrintf("server %d apply log %d", rf.me, rf.lastApplied)
+		}
 		rf.mu.Unlock()
 	}
 	return checkResult
