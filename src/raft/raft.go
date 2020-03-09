@@ -258,7 +258,7 @@ func (rf *Raft) sendHeartBeat(server int) {
 	args.Term = rf.currentTerm
 
 	// if not sync with this server, send heartbeat with empty Entries
-	if !rf.syncServer[server] {
+	if !rf.syncServer[server] || rf.nextIndex[server]-1 == rf.lastLogIndex {
 		DPrintf("server%d send heartbeat to server%d, PT %d, PI %d",
 			rf.me, server, args.PrevLogTerm, args.PrevLogIndex)
 		ok := rf.peers[server].Call("Raft.AppendEntries", &args, &reply)
@@ -287,7 +287,7 @@ func (rf *Raft) sendHeartBeat(server int) {
 	// if already sync
 	args.PrevLogIndex = rf.nextIndex[server] - 1
 	args.PrevLogTerm = rf.log[args.PrevLogIndex].CommandTerm
-	args.Entries = rf.log[args.PrevLogIndex:len(rf.log)]
+	args.Entries = rf.log[rf.nextIndex[server]:len(rf.log)]
 	recordLastLogIndex := rf.lastLogIndex
 	DPrintf("server%d send heartbeat to server%d, PT %d, PI %d, sync nextIndex %d, leader commitIndex %d",
 		rf.me, server, args.PrevLogTerm, args.PrevLogIndex, rf.nextIndex[server], rf.commitIndex)
@@ -503,8 +503,8 @@ func (rf *Raft) syncWithServer(server, matchAtIndex int) {
 		majority := matchCopy[len(matchCopy)/2]
 
 		if majority > rf.commitIndex {
-			for i := rf.commitIndex + 1; i <= majority; i++ {
-				DPrintf("apply %d log", i)
+			for i := rf.lastApplied + 1; i <= majority; i++ {
+				DPrintf("leader%d apply %d log, commitIndex %d", rf.me, i, rf.commitIndex)
 				rf.applyChan <- rf.log[i]
 				rf.lastApplied = i
 			}
@@ -548,34 +548,27 @@ func (rf *Raft) logInconsistencies(server, lastHBTerm int) {
 
 func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries []ApplyMsg) bool {
 	checkResult := false
-	var checkPoint int
 	if checkTerm > rf.lastLogTerm || checkIndex > rf.lastLogIndex {
 		return checkResult
 	}
-	for i := len(rf.log) - 1; i >= 0; i-- {
-		if rf.log[i].CommandIndex == checkIndex && rf.log[i].CommandTerm == checkTerm {
-			checkPoint = i
-			checkResult = true
-		}
+	if rf.log[checkIndex].CommandTerm != checkTerm {
+		return checkResult
 	}
+	checkResult = true
 	if checkResult {
 		rf.mu.Lock()
 		for i := 0; i < len(entries); i++ {
 			// check existing log
-			if i+checkPoint < len(rf.log) {
-				rf.log[i+checkPoint] = entries[i]
-			} else {
-				rf.log = append(rf.log, entries[i])
-			}
+			rf.log = append(rf.log, entries[i])
 		}
 		rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
 		rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
 		if rf.commitIndex < leaderCommit {
 			for i := rf.commitIndex + 1; i <= leaderCommit; i++ {
 				rf.applyChan <- rf.log[i]
+				rf.lastApplied = i
 			}
 			rf.commitIndex = leaderCommit
-			rf.lastApplied = leaderCommit
 		}
 		rf.mu.Unlock()
 	}
