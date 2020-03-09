@@ -162,6 +162,14 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		return
 	}
 	if rf.currentTerm < args.Term {
+		if rf.lastLogTerm > args.LastLogTerm {
+			rf.resetToFollower(args.Term)
+			return
+		}
+		if rf.lastLogTerm == args.LastLogTerm && rf.lastLogIndex > args.LastLogIndex {
+			rf.resetToFollower(args.Term)
+			return
+		}
 		rf.voteToOther(args.CandidateID, args.Term)
 		reply.Term = rf.currentTerm
 		reply.VoteGranted = true
@@ -253,8 +261,8 @@ func (rf *Raft) sendHeartBeat(server int) {
 	args.Entries = []ApplyMsg{}
 	args.LeaderCommit = rf.commitIndex
 	args.LeaderID = rf.me
-	args.PrevLogIndex = rf.lastLogIndex
-	args.PrevLogTerm = rf.lastLogTerm
+	args.PrevLogIndex = rf.nextIndex[server] - 1
+	args.PrevLogTerm = rf.log[args.PrevLogIndex].CommandTerm
 	args.Term = rf.currentTerm
 
 	// if not sync with this server, send heartbeat with empty Entries
@@ -285,8 +293,6 @@ func (rf *Raft) sendHeartBeat(server int) {
 	}
 
 	// if already sync
-	args.PrevLogIndex = rf.nextIndex[server] - 1
-	args.PrevLogTerm = rf.log[args.PrevLogIndex].CommandTerm
 	args.Entries = rf.log[rf.nextIndex[server]:len(rf.log)]
 	recordLastLogIndex := rf.lastLogIndex
 	DPrintf("server%d send heartbeat to server%d, PT %d, PI %d, sync nextIndex %d, leader commitIndex %d",
@@ -335,8 +341,9 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	rf.log = append(rf.log, log)
 	rf.lastLogIndex = index
 	rf.lastLogTerm = term
+	rf.matchIndex[rf.me] = rf.lastLogIndex
 	rf.mu.Unlock()
-	DPrintf("leader%d get command, lastLogIndex %d, lastLogTerm %d",
+	DPrintf("leader server %d get command, lastLogIndex %d, lastLogTerm %d",
 		rf.me, rf.lastLogIndex, rf.lastLogTerm)
 	return index, term, isLeader
 }
@@ -397,7 +404,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.matchIndex = []int{}
 	rf.syncServer = []bool{}
 	rf.timeRecord = time.Now()
-	rf.electionTimeout = rand.Int63n(150) + 150
 	rf.lastLogIndex = 0
 	rf.lastLogTerm = 0
 	rf.leaderID = -1
@@ -413,6 +419,9 @@ func Make(peers []*labrpc.ClientEnd, me int,
 func (rf *Raft) run() {
 	for {
 		time.Sleep(time.Millisecond * 15)
+		if rf.killed() {
+			return
+		}
 		if int64(time.Since(rf.timeRecord)/time.Millisecond) > rf.electionTimeout {
 			if rf.state == "follower" || rf.state == "candidate" {
 				go rf.electLeader()
@@ -433,7 +442,8 @@ func (rf *Raft) electLeader() {
 }
 
 func (rf *Raft) heartBeat() {
-	DPrintf("server%d heartbeat, term %d", rf.me, rf.currentTerm)
+	DPrintf("server%d heartbeat, term %d, leader lastLogIndex %d",
+		rf.me, rf.currentTerm, rf.lastLogIndex)
 	rf.mu.Lock()
 	rf.timeRecord = time.Now()
 	rf.mu.Unlock()
@@ -454,6 +464,7 @@ func (rf *Raft) resetToFollower(resetTerm int) {
 	rf.timeRecord = time.Now()
 	rf.getVote = 0
 	rf.leaderID = -1
+	rf.electionTimeout = rand.Int63n(50) + 200
 	rf.mu.Unlock()
 }
 
@@ -475,6 +486,8 @@ func (rf *Raft) resetToLeader() {
 	defer rf.mu.Unlock()
 	rf.state = "leader"
 	rf.leaderID = rf.me
+	rf.timeRecord = time.Now()
+	rf.electionTimeout = rand.Int63n(50) + 100
 	nextIndex := []int{}
 	matchIndex := []int{}
 	syncServer := []bool{}
@@ -483,6 +496,8 @@ func (rf *Raft) resetToLeader() {
 		matchIndex = append(matchIndex, 0)
 		syncServer = append(syncServer, false)
 	}
+	matchIndex[rf.me] = rf.lastLogIndex
+	syncServer[rf.me] = true
 	rf.nextIndex = nextIndex
 	rf.matchIndex = matchIndex
 	rf.syncServer = syncServer
@@ -501,14 +516,15 @@ func (rf *Raft) syncWithServer(server, matchAtIndex int) {
 		}
 		sort.Ints(matchCopy[:])
 		majority := matchCopy[len(matchCopy)/2]
+		DPrintf("leader server %d update matchIndex %v", rf.me, rf.matchIndex)
 
 		if majority > rf.commitIndex {
+			rf.commitIndex = majority
 			for i := rf.lastApplied + 1; i <= majority; i++ {
-				DPrintf("leader%d apply %d log, commitIndex %d", rf.me, i, rf.commitIndex)
+				DPrintf("leader server %d apply log %d, commitIndex %d", rf.me, i, rf.commitIndex)
 				rf.applyChan <- rf.log[i]
 				rf.lastApplied = i
 			}
-			rf.commitIndex = majority
 		}
 	}
 	rf.nextIndex[server] = matchAtIndex + 1
@@ -540,7 +556,7 @@ func (rf *Raft) logInconsistencies(server, lastHBTerm int) {
 	for i := len(rf.log) - 1; i >= 0; i-- {
 		if rf.log[i].CommandTerm == lastHBTerm-1 {
 			rf.mu.Lock()
-			rf.nextIndex[server] = i
+			rf.nextIndex[server] = i + 1
 			rf.mu.Unlock()
 		}
 	}
@@ -557,19 +573,37 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 	checkResult = true
 	if checkResult {
 		rf.mu.Lock()
-		for i := 0; i < len(entries); i++ {
-			// check existing log
-			rf.log = append(rf.log, entries[i])
+		// find a match point
+		DPrintf(`server%d sync with leader function, leaderCommit %d, checkIndex %d,
+		checkTerm %d, entries length %d`,
+			rf.me, leaderCommit, checkIndex, checkTerm, len(entries))
+		if len(entries) > 0 && entries[0].CommandIndex == rf.lastLogIndex+1 {
+			for i := 0; i < len(entries); i++ {
+				rf.log = append(rf.log, entries[i])
+			}
+		} else if len(entries) > 0 {
+			var checkPoint int
+			for k, v := range entries {
+				if v.CommandIndex == rf.lastLogTerm && v.CommandTerm == rf.lastLogTerm {
+					checkPoint = k
+					break
+				}
+			}
+			for i := checkPoint + 1; i < len(entries); i++ {
+				rf.log = append(rf.log, entries[i])
+			}
 		}
+
 		rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
 		rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
-		if rf.commitIndex < leaderCommit {
-			for i := rf.commitIndex + 1; i <= leaderCommit; i++ {
+		if rf.lastLogIndex <= leaderCommit {
+			for i := rf.lastApplied + 1; i <= rf.lastLogIndex; i++ {
+				DPrintf("server %d apply log %d", rf.me, i)
 				rf.applyChan <- rf.log[i]
 				rf.lastApplied = i
 			}
-			rf.commitIndex = leaderCommit
 		}
+		rf.commitIndex = leaderCommit
 		rf.mu.Unlock()
 	}
 	return checkResult
