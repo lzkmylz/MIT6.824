@@ -2,6 +2,7 @@ package raft
 
 import (
 	"math/rand"
+	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -204,10 +205,11 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 	rf.mu.Lock()
 	rf.leaderID = args.LeaderID
+	rf.timeRecord = time.Now()
 	rf.mu.Unlock()
 	syncStatus := rf.syncWithLeader(args.LeaderCommit, args.PrevLogIndex, args.PrevLogTerm, args.Entries)
-	DPrintf("server%d sync with leader server%d, leaderCommit %d, leader PL %d, leader PT %d, sync Result %t",
-		rf.me, args.LeaderID, args.LeaderCommit, args.PrevLogIndex, args.PrevLogTerm, syncStatus)
+	DPrintf("server%d sync with leader server%d, leaderCommit %d, leader PL %d, leader PT %d, sync Result %t, entities length %d, after sync log length %d, self commitIndex %d",
+		rf.me, args.LeaderID, args.LeaderCommit, args.PrevLogIndex, args.PrevLogTerm, syncStatus, len(args.Entries), len(rf.log), rf.commitIndex)
 	if syncStatus {
 		reply.Term = rf.currentTerm
 		reply.Success = true
@@ -256,8 +258,9 @@ func (rf *Raft) sendHeartBeat(server int) {
 	args.Term = rf.currentTerm
 
 	// if not sync with this server, send heartbeat with empty Entries
-	DPrintf("server%d send heartbeat to server%d", rf.me, server)
 	if !rf.syncServer[server] {
+		DPrintf("server%d send heartbeat to server%d, PT %d, PI %d",
+			rf.me, server, args.PrevLogTerm, args.PrevLogIndex)
 		ok := rf.peers[server].Call("Raft.AppendEntries", &args, &reply)
 		if ok {
 			// hearbeat failed because of term, revert to follower
@@ -284,8 +287,10 @@ func (rf *Raft) sendHeartBeat(server int) {
 	// if already sync
 	args.PrevLogIndex = rf.nextIndex[server] - 1
 	args.PrevLogTerm = rf.log[args.PrevLogIndex].CommandTerm
-	args.Entries = rf.log[args.PrevLogIndex : len(rf.log)-1]
-	recordLastLogIndex := rf.log[len(rf.log)-1].CommandIndex
+	args.Entries = rf.log[args.PrevLogIndex:len(rf.log)]
+	recordLastLogIndex := rf.lastLogIndex
+	DPrintf("server%d send heartbeat to server%d, PT %d, PI %d, sync nextIndex %d, leader commitIndex %d",
+		rf.me, server, args.PrevLogTerm, args.PrevLogIndex, rf.nextIndex[server], rf.commitIndex)
 	ok := rf.peers[server].Call("Raft.AppendEntries", &args, &reply)
 	if ok {
 		// hearbeat failed because of term, revert to follower
@@ -312,11 +317,14 @@ func (rf *Raft) sendHeartBeat(server int) {
 func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	index := -1
 	term := -1
-	isLeader := true
+	isLeader := rf.state == "leader"
 
 	// Your code here (2B).
 	index = rf.lastLogIndex + 1
 	term = rf.currentTerm
+	if !isLeader {
+		return index, term, isLeader
+	}
 	log := ApplyMsg{
 		Command:      command,
 		CommandIndex: index,
@@ -328,7 +336,8 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	rf.lastLogIndex = index
 	rf.lastLogTerm = term
 	rf.mu.Unlock()
-
+	DPrintf("leader%d get command, lastLogIndex %d, lastLogTerm %d",
+		rf.me, rf.lastLogIndex, rf.lastLogTerm)
 	return index, term, isLeader
 }
 
@@ -485,15 +494,21 @@ func (rf *Raft) syncWithServer(server, matchAtIndex int) {
 	if rf.matchIndex[server] < matchAtIndex {
 		rf.matchIndex[server] = matchAtIndex
 
-		min := rf.matchIndex[0]
+		// count matchIndex with hash map
+		matchCopy := []int{}
 		for _, v := range rf.matchIndex {
-			min = Min(min, v)
+			matchCopy = append(matchCopy, v)
 		}
-		if min > rf.commitIndex {
-			for i := rf.commitIndex; i < min; i++ {
+		sort.Ints(matchCopy[:])
+		majority := matchCopy[len(matchCopy)/2]
+
+		if majority > rf.commitIndex {
+			for i := rf.commitIndex + 1; i <= majority; i++ {
+				DPrintf("apply %d log", i)
 				rf.applyChan <- rf.log[i]
+				rf.lastApplied = i
 			}
-			rf.commitIndex = min
+			rf.commitIndex = majority
 		}
 	}
 	rf.nextIndex[server] = matchAtIndex + 1
