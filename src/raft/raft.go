@@ -228,7 +228,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 }
 
 func (rf *Raft) sendRequestVote(server int) {
-	DPrintf("server%d request server %d to vote, term %d", rf.me, server, rf.currentTerm)
+	DPrintf("server%d request server%d to vote, term %d", rf.me, server, rf.currentTerm)
 	args := RequestVoteArgs{}
 	reply := RequestVoteReply{}
 	args.Term = rf.currentTerm
@@ -248,7 +248,7 @@ func (rf *Raft) sendRequestVote(server int) {
 			return
 		}
 		if reply.VoteGranted {
-			DPrintf("server%d get vote from server %d, term %d",
+			DPrintf("server%d get vote from server%d, term %d",
 				rf.me, server, rf.currentTerm)
 			rf.getVoteFromOther()
 		}
@@ -343,7 +343,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	rf.lastLogTerm = term
 	rf.matchIndex[rf.me] = rf.lastLogIndex
 	rf.mu.Unlock()
-	DPrintf("leader server %d get command, lastLogIndex %d, lastLogTerm %d",
+	DPrintf("leader server%d get command, lastLogIndex %d, lastLogTerm %d",
 		rf.me, rf.lastLogIndex, rf.lastLogTerm)
 	return index, term, isLeader
 }
@@ -516,12 +516,12 @@ func (rf *Raft) syncWithServer(server, matchAtIndex int) {
 		}
 		sort.Ints(matchCopy[:])
 		majority := matchCopy[len(matchCopy)/2]
-		DPrintf("leader server %d update matchIndex %v", rf.me, rf.matchIndex)
+		DPrintf("leader server%d update matchIndex %v", rf.me, rf.matchIndex)
 
 		if majority > rf.commitIndex {
 			rf.commitIndex = majority
 			for i := rf.lastApplied + 1; i <= majority; i++ {
-				DPrintf("leader server %d apply log %d, commitIndex %d", rf.me, i, rf.commitIndex)
+				DPrintf("leader server%d apply log %d, commitIndex %d", rf.me, i, rf.commitIndex)
 				rf.applyChan <- rf.log[i]
 				rf.lastApplied = i
 			}
@@ -546,7 +546,7 @@ func (rf *Raft) voteToOther(server, newTerm int) {
 	rf.mu.Lock()
 	rf.votedFor = server
 	rf.mu.Unlock()
-	DPrintf("server%d vote to server %d, term %d",
+	DPrintf("server%d vote to server%d, term %d",
 		rf.me, server, rf.currentTerm)
 }
 
@@ -568,9 +568,11 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 	checkTerm %d, entries length %d`,
 		rf.me, leaderCommit, checkIndex, checkTerm, len(entries))
 	if checkTerm > rf.lastLogTerm || checkIndex > rf.lastLogIndex {
+		DPrintf("check failed because of checkTerm > rf.lastLogTerm")
 		return checkResult
 	}
 	if rf.log[checkIndex].CommandTerm != checkTerm {
+		DPrintf("check failed because rf.log[checkIndex].CommandTerm != checkTerm")
 		return checkResult
 	}
 	checkResult = true
@@ -594,22 +596,11 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 					}
 				}
 			}
+		} else {
+			if rf.lastLogIndex > checkIndex {
+				rf.log = rf.log[:checkIndex+1]
+			}
 		}
-		/*
-			entriesStartPoint := entries[0]
-			checkPoint := -1
-			for k, v := range entries {
-				if v.CommandIndex == rf.lastLogIndex+1 {
-					checkPoint = k
-					break
-				}
-			}
-			if checkPoint >= 0 {
-				for i := checkPoint; i < len(entries); i++ {
-					rf.log = append(rf.log, entries[i])
-				}
-			}
-		*/
 
 		rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
 		rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
@@ -617,7 +608,7 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 		if rf.lastApplied+1 <= leaderCommit && rf.lastApplied+1 <= rf.lastLogIndex {
 			rf.applyChan <- rf.log[rf.lastApplied+1]
 			rf.lastApplied = rf.lastApplied + 1
-			DPrintf("server %d apply log %d", rf.me, rf.lastApplied)
+			DPrintf("server%d apply log %d", rf.me, rf.lastApplied)
 		}
 		rf.mu.Unlock()
 	}
