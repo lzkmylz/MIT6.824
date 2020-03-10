@@ -1,6 +1,8 @@
 package raft
 
 import (
+	"bytes"
+	"encoding/gob"
 	"math/rand"
 	"sort"
 	"sync"
@@ -11,7 +13,6 @@ import (
 )
 
 // import "bytes"
-// import "../labgob"
 
 //
 // ApplyMsg as each Raft peer becomes aware that successive log entries are
@@ -88,6 +89,18 @@ func (rf *Raft) persist() {
 	// e.Encode(rf.yyy)
 	// data := w.Bytes()
 	// rf.persister.SaveRaftState(data)
+	w := new(bytes.Buffer)
+	e := gob.NewEncoder(w)
+	e.Encode(rf.currentTerm)
+	e.Encode(rf.votedFor)
+	e.Encode(rf.log)
+	e.Encode(rf.commitIndex)
+	e.Encode(rf.lastApplied)
+	e.Encode(rf.lastLogIndex)
+	e.Encode(rf.lastLogTerm)
+	data := w.Bytes()
+	rf.persister.SaveRaftState(data)
+	DPrintf("Persist server%d's state, data length %d", rf.me, rf.persister.RaftStateSize())
 }
 
 //
@@ -110,6 +123,17 @@ func (rf *Raft) readPersist(data []byte) {
 	//   rf.xxx = xxx
 	//   rf.yyy = yyy
 	// }
+	r := bytes.NewBuffer(data)
+	d := gob.NewDecoder(r)
+	d.Decode(&rf.currentTerm)
+	d.Decode(&rf.votedFor)
+	d.Decode(&rf.log)
+	d.Decode(&rf.commitIndex)
+	d.Decode(&rf.lastApplied)
+	d.Decode(&rf.lastLogIndex)
+	d.Decode(&rf.lastLogTerm)
+	DPrintf("server%d read from persister, currentTerm %d, votedFor %d, log length %d, persist data length %d",
+		rf.me, rf.currentTerm, rf.votedFor, len(rf.log), rf.persister.RaftStateSize())
 }
 
 //
@@ -461,6 +485,7 @@ func (rf *Raft) resetToFollower(resetTerm int) {
 	rf.mu.Lock()
 	if resetTerm != -1 && resetTerm > rf.currentTerm {
 		rf.currentTerm = resetTerm
+		rf.persist()
 	}
 	rf.votedFor = -1
 	rf.state = "follower"
@@ -481,12 +506,12 @@ func (rf *Raft) resetToCandidate() {
 	rf.leaderID = -1
 	DPrintf("server%d become candidate, term %d", rf.me, rf.currentTerm)
 	rf.mu.Unlock()
+	rf.persist()
 }
 
 func (rf *Raft) resetToLeader() {
 	DPrintf("server%d become leader, term %d", rf.me, rf.currentTerm)
 	rf.mu.Lock()
-	defer rf.mu.Unlock()
 	rf.state = "leader"
 	rf.leaderID = rf.me
 	rf.timeRecord = time.Now()
@@ -504,11 +529,12 @@ func (rf *Raft) resetToLeader() {
 	rf.nextIndex = nextIndex
 	rf.matchIndex = matchIndex
 	rf.syncServer = syncServer
+	rf.mu.Unlock()
+	rf.persist()
 }
 
 func (rf *Raft) syncWithServer(server, matchAtIndex int) {
 	rf.mu.Lock()
-	defer rf.mu.Unlock()
 	if rf.matchIndex[server] < matchAtIndex {
 		rf.matchIndex[server] = matchAtIndex
 
@@ -532,6 +558,8 @@ func (rf *Raft) syncWithServer(server, matchAtIndex int) {
 	}
 	rf.nextIndex[server] = matchAtIndex + 1
 	rf.syncServer[server] = true
+	rf.mu.Unlock()
+	rf.persist()
 }
 
 func (rf *Raft) getVoteFromOther() {
@@ -551,6 +579,7 @@ func (rf *Raft) voteToOther(server, newTerm int) {
 	rf.mu.Unlock()
 	DPrintf("server%d vote to server%d, term %d",
 		rf.me, server, rf.currentTerm)
+	rf.persist()
 }
 
 func (rf *Raft) logInconsistencies(server, lastHBTerm int) {
@@ -588,6 +617,7 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 		rf.mu.Lock()
 		rf.log = rf.log[:rf.commitIndex+1]
 		rf.mu.Unlock()
+		rf.persist()
 		return checkResult
 	}
 	checkResult = true
@@ -643,5 +673,6 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 		}
 		rf.mu.Unlock()
 	}
+	rf.persist()
 	return checkResult
 }
