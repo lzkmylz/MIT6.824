@@ -256,6 +256,9 @@ func (rf *Raft) sendRequestVote(server int) {
 }
 
 func (rf *Raft) sendHeartBeat(server int) {
+	if rf.state != "leader" {
+		return
+	}
 	args := AppendEntriesArgs{}
 	reply := AppendEntriesReply{}
 	args.Entries = []ApplyMsg{}
@@ -617,10 +620,26 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 		rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
 		rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
 		rf.commitIndex = leaderCommit
-		if rf.lastApplied+1 <= leaderCommit && rf.lastApplied+1 <= rf.lastLogIndex {
-			rf.applyChan <- rf.log[rf.lastApplied+1]
-			rf.lastApplied = rf.lastApplied + 1
-			DPrintf("server%d apply log %d", rf.me, rf.lastApplied)
+		/*
+			if rf.lastApplied+1 <= leaderCommit && rf.lastApplied+1 <= rf.lastLogIndex {
+				rf.applyChan <- rf.log[rf.lastApplied+1]
+				rf.lastApplied = rf.lastApplied + 1
+				DPrintf("server%d apply log %d", rf.me, rf.lastApplied)
+			}
+		*/
+		// it is safe to commit to leaderCommit
+		if len(entries) > 0 {
+			for i := rf.lastApplied + 1; i <= leaderCommit; i++ {
+				rf.applyChan <- rf.log[i]
+				rf.lastApplied = i
+				DPrintf("server%d apply log %d", rf.me, rf.lastApplied)
+			}
+		} else {
+			if rf.lastApplied+1 <= leaderCommit && rf.lastApplied+1 <= rf.lastLogIndex {
+				rf.applyChan <- rf.log[rf.lastApplied+1]
+				rf.lastApplied = rf.lastApplied + 1
+				DPrintf("server%d apply log %d", rf.me, rf.lastApplied)
+			}
 		}
 		rf.mu.Unlock()
 	}

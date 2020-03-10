@@ -1,0 +1,82 @@
+servers := 5
+	cfg := make_config(t, servers, false)
+	defer cfg.cleanup()
+
+	cfg.begin("Test (2B): leader backs up quickly over incorrect follower logs")
+
+	cfg.one(rand.Int(), servers, true)
+	这里leader是server0，[1 1 1 1 1]
+
+这里server 2、3、4断线
+	// put leader and one follower in a partition
+	leader1 := cfg.checkOneLeader()
+	cfg.disconnect((leader1 + 2) % servers)
+	cfg.disconnect((leader1 + 3) % servers)
+	cfg.disconnect((leader1 + 4) % servers)
+
+这里server 0、1在线，leader server0 [51 51 1 1 1]
+	// submit lots of commands that won't commit
+	for i := 0; i < 50; i++ {
+		cfg.rafts[leader1].Start(rand.Int())
+	}
+
+	time.Sleep(RaftElectionTimeout / 2)
+
+这里server 0、1断线
+	cfg.disconnect((leader1 + 0) % servers)
+	cfg.disconnect((leader1 + 1) % servers)
+
+server2、3、4连线回来，新leader是server4 [0 0 1 1 1]，leaderTerm4
+	// allow other partition to recover
+	cfg.connect((leader1 + 2) % servers)
+	cfg.connect((leader1 + 3) % servers)
+	cfg.connect((leader1 + 4) % servers)
+
+这里2、3、4成功commit并apply，[0 0 51 51 51]
+	// lots of successful commands to new group.
+	for i := 0; i < 50; i++ {
+		cfg.one(rand.Int(), 3, true)
+	}
+
+这里server2离线，server3、4在线
+	// now another partitioned leader and one follower
+	leader2 := cfg.checkOneLeader()
+	other := (leader1 + 2) % servers
+	if leader2 == other {
+		other = (leader2 + 1) % servers
+	}
+	cfg.disconnect(other)
+
+	// lots more commands that won't commit
+	for i := 0; i < 50; i++ {
+		cfg.rafts[leader2].Start(rand.Int())
+	}
+这里追加状态为[0 0 51 101 101]，term4
+	time.Sleep(RaftElectionTimeout / 2)
+
+这里server0、1、2连线，其他离线
+server0 lastLogIndex 1, lastLogTerm 1
+server1 lastLogIndex 1, lastLogTerm 1
+server2 lastLogIndex 51, lastLogTerm 4
+达成一致，新term53，[51 51 51 0 0] server0、1两个apply到51
+	// bring original leader back to life,
+	for i := 0; i < servers; i++ {
+		cfg.disconnect(i)
+	}
+	cfg.connect((leader1 + 0) % servers)
+	cfg.connect((leader1 + 1) % servers)
+	cfg.connect(other)
+
+[101 101 101 0 0] server0、1、2一直commit并apply到101
+	// lots of successful commands to new group.
+	for i := 0; i < 50; i++ {
+		cfg.one(rand.Int(), 3, true)
+	}
+
+	// now everyone
+	for i := 0; i < servers; i++ {
+		cfg.connect(i)
+	}
+	cfg.one(rand.Int(), servers, true)
+
+	cfg.end()
