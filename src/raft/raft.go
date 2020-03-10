@@ -551,15 +551,23 @@ func (rf *Raft) voteToOther(server, newTerm int) {
 }
 
 func (rf *Raft) logInconsistencies(server, lastHBTerm int) {
-	DPrintf("leader%d try consistence with server%d, lastHBTerm %d",
-		rf.me, server, lastHBTerm)
+	recordIndex := 0
+	recordTerm := 0
 	for i := 0; i < len(rf.log); i++ {
-		if rf.log[i].CommandTerm == lastHBTerm-1 {
-			rf.mu.Lock()
-			rf.nextIndex[server] = i + 1
-			rf.mu.Unlock()
+		if rf.log[i].CommandTerm < lastHBTerm && rf.log[i].CommandTerm > recordTerm && i > recordIndex {
+			recordIndex = i
+			recordTerm = rf.log[i].CommandTerm
 		}
 	}
+	rf.mu.Lock()
+	if recordIndex == 0 {
+		rf.nextIndex[server] = 1
+	} else {
+		rf.nextIndex[server] = recordIndex
+	}
+	rf.mu.Unlock()
+	DPrintf("leader%d try consistence with server%d, lastHBTerm %d, after consistence nextIndex %d, term %d",
+		rf.me, server, lastHBTerm, recordIndex, recordTerm)
 }
 
 func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries []ApplyMsg) bool {
@@ -568,11 +576,15 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 	checkTerm %d, entries length %d`,
 		rf.me, leaderCommit, checkIndex, checkTerm, len(entries))
 	if checkTerm > rf.lastLogTerm || checkIndex > rf.lastLogIndex {
-		DPrintf("check failed because of checkTerm > rf.lastLogTerm")
+		DPrintf("check failed because of checkTerm %d > rf.lastLogTerm %d || checkIndex %d > rf.lastLogIndex %d, self commitIndex %d, self lastLogIndex %d",
+			checkTerm, rf.lastLogTerm, checkIndex, rf.lastLogIndex, rf.commitIndex, rf.lastLogIndex)
 		return checkResult
 	}
 	if rf.log[checkIndex].CommandTerm != checkTerm {
 		DPrintf("check failed because rf.log[checkIndex].CommandTerm != checkTerm")
+		rf.mu.Lock()
+		rf.log = rf.log[:rf.commitIndex+1]
+		rf.mu.Unlock()
 		return checkResult
 	}
 	checkResult = true
