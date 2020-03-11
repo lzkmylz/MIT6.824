@@ -1,210 +1,32 @@
+Test (2C): basic persistence ...
+  ... Passed --   4.6  3   92   23904    6
+Test (2C): more persistence ...
+  ... Passed --  18.3  5 1012  227522   16
+Test (2C): partitioned leader and one follower crash, leader restarts ...
+  ... Passed --   2.2  3   36    9399    4
+Test (2C): Figure 8 ...
+  ... Passed --  28.8  5  772  145677    7
 Test (2C): unreliable agreement ...
-2020/03/11 10:43:57 server1 become candidate, term 1
-2020/03/11 10:43:57 Persist server1's state, data length 131
-2020/03/11 10:43:57 server1 request server4 to vote, term 1
-2020/03/11 10:43:57 server1 request server2 to vote, term 1
-2020/03/11 10:43:57 server1 request server0 to vote, term 1
-2020/03/11 10:43:57 server1 request server3 to vote, term 1
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 server2 vote to server1, term 1
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 server1 get vote from server2, term 1
-2020/03/11 10:43:57 Persist server4's state, data length 131
-2020/03/11 10:43:57 server4 vote to server1, term 1
-2020/03/11 10:43:57 Persist server4's state, data length 131
-2020/03/11 10:43:57 server1 get vote from server4, term 1
-2020/03/11 10:43:57 server1 become leader, term 1
-2020/03/11 10:43:57 server1 heartbeat, term 1, leader lastLogIndex 0
-2020/03/11 10:43:57 server1 send heartbeat to server4, PT 0, PI 0
-2020/03/11 10:43:57 server1 send heartbeat to server2, PT 0, PI 0
-2020/03/11 10:43:57 server1 send heartbeat to server3, PT 0, PI 0
-2020/03/11 10:43:57 server1 send heartbeat to server0, PT 0, PI 0
-2020/03/11 10:43:57 server2 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
-2020/03/11 10:43:57 server2 sync with leader function, leaderCommit 0, checkIndex 0,
-	checkTerm 0, entries length 0
-2020/03/11 10:43:57 server2 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true, entities length 0, after sync log length 1, self commitIndex 0
-2020/03/11 10:43:57 Persist server1's state, data length 131
-2020/03/11 10:43:57 server0 become candidate, term 1
-2020/03/11 10:43:57 Persist server0's state, data length 131
-2020/03/11 10:43:57 server0 request server4 to vote, term 1
-2020/03/11 10:43:57 server0 request server2 to vote, term 1
-2020/03/11 10:43:57 server0 request server1 to vote, term 1
-2020/03/11 10:43:57 server0 request server3 to vote, term 1
-2020/03/11 10:43:57 Persist server3's state, data length 131
-2020/03/11 10:43:57 server3 vote to server1, term 1
-2020/03/11 10:43:57 server3 become candidate, term 2
-2020/03/11 10:43:57 Persist server3's state, data length 131
-2020/03/11 10:43:57 Persist server3's state, data length 131
-2020/03/11 10:43:57 server3 request server4 to vote, term 2
-2020/03/11 10:43:57 server3 request server1 to vote, term 2
-2020/03/11 10:43:57 server3 request server2 to vote, term 2
-2020/03/11 10:43:57 server3 request server0 to vote, term 2
-2020/03/11 10:43:57 Persist server1's state, data length 131
-2020/03/11 10:43:57 server0 get heartbeat from server1, leader term 1, self term 1, is empty heartbeat: true
-2020/03/11 10:43:57 server0 sync with leader function, leaderCommit 0, checkIndex 0,
-	checkTerm 0, entries length 0
-2020/03/11 10:43:57 server0 sync with leader server1, leaderCommit 0, leader PL 0, leader PT 0, sync Result true, entities length 0, after sync log length 1, self commitIndex 0
-2020/03/11 10:43:57 Persist server4's state, data length 131
-2020/03/11 10:43:57 server4 vote to server3, term 2
-2020/03/11 10:43:57 Persist server4's state, data length 131
-2020/03/11 10:43:57 Persist server1's state, data length 131
-2020/03/11 10:43:57 server3 get vote from server4, term 2
-2020/03/11 10:43:57 leader1 try consistence with server4, lastHBTerm 0, after consistence nextIndex 0, term 0
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 server2 vote to server3, term 2
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 Persist server0's state, data length 131
-2020/03/11 10:43:57 leader1 try consistence with server3, lastHBTerm 0, after consistence nextIndex 0, term 0
-2020/03/11 10:43:57 server1 vote to server3, term 2
-2020/03/11 10:43:57 Persist server1's state, data length 131
-2020/03/11 10:43:57 server1 become candidate, term 3
-2020/03/11 10:43:57 server3 become candidate, term 3
-2020/03/11 10:43:57 Persist server1's state, data length 131
-2020/03/11 10:43:57 Persist server3's state, data length 131
-2020/03/11 10:43:57 server1 request server0 to vote, term 3
-2020/03/11 10:43:57 server1 request server4 to vote, term 3
-2020/03/11 10:43:57 server1 request server2 to vote, term 3
-2020/03/11 10:43:57 server4 become candidate, term 3
-2020/03/11 10:43:57 Persist server4's state, data length 131
-2020/03/11 10:43:57 server4 request server3 to vote, term 3
-2020/03/11 10:43:57 server1 request server3 to vote, term 3
-2020/03/11 10:43:57 server4 request server1 to vote, term 3
-2020/03/11 10:43:57 server3 request server1 to vote, term 3
-2020/03/11 10:43:57 server3 request server4 to vote, term 3
-2020/03/11 10:43:57 server4 request server2 to vote, term 3
-2020/03/11 10:43:57 server3 request server2 to vote, term 3
-2020/03/11 10:43:57 server3 request server0 to vote, term 3
-2020/03/11 10:43:57 server4 request server0 to vote, term 3
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 server2 vote to server1, term 3
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 server0 become candidate, term 3
-2020/03/11 10:43:57 Persist server0's state, data length 131
-2020/03/11 10:43:57 server0 request server4 to vote, term 3
-2020/03/11 10:43:57 server0 request server1 to vote, term 3
-2020/03/11 10:43:57 server0 request server2 to vote, term 3
-2020/03/11 10:43:57 server0 request server3 to vote, term 3
-2020/03/11 10:43:57 server2 become candidate, term 4
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 server2 request server4 to vote, term 4
-2020/03/11 10:43:57 server2 request server1 to vote, term 4
-2020/03/11 10:43:57 server2 request server0 to vote, term 4
-2020/03/11 10:43:57 server2 request server3 to vote, term 4
-2020/03/11 10:43:57 Persist server0's state, data length 131
-2020/03/11 10:43:57 server0 vote to server2, term 4
-2020/03/11 10:43:57 Persist server0's state, data length 131
-2020/03/11 10:43:57 server2 get vote from server0, term 4
-2020/03/11 10:43:57 Persist server3's state, data length 131
-2020/03/11 10:43:57 server3 vote to server2, term 4
-2020/03/11 10:43:57 Persist server3's state, data length 131
-2020/03/11 10:43:57 server2 get vote from server3, term 4
-2020/03/11 10:43:57 server2 become leader, term 4
-2020/03/11 10:43:57 server2 heartbeat, term 4, leader lastLogIndex 0
-2020/03/11 10:43:57 server2 send heartbeat to server4, PT 0, PI 0
-2020/03/11 10:43:57 server2 send heartbeat to server1, PT 0, PI 0
-2020/03/11 10:43:57 server2 send heartbeat to server0, PT 0, PI 0
-2020/03/11 10:43:57 server2 send heartbeat to server3, PT 0, PI 0
-2020/03/11 10:43:57 server1 become candidate, term 4
-2020/03/11 10:43:57 server4 become candidate, term 4
-2020/03/11 10:43:57 Persist server4's state, data length 131
-2020/03/11 10:43:57 server4 request server3 to vote, term 4
-2020/03/11 10:43:57 server4 request server1 to vote, term 4
-2020/03/11 10:43:57 server4 request server0 to vote, term 4
-2020/03/11 10:43:57 server4 request server2 to vote, term 4
-2020/03/11 10:43:57 Persist server1's state, data length 131
-2020/03/11 10:43:57 server1 request server4 to vote, term 4
-2020/03/11 10:43:57 server1 request server2 to vote, term 4
-2020/03/11 10:43:57 server1 request server3 to vote, term 4
-2020/03/11 10:43:57 server1 request server0 to vote, term 4
-2020/03/11 10:43:57 server0 get heartbeat from server2, leader term 4, self term 4, is empty heartbeat: true
-2020/03/11 10:43:57 server0 sync with leader function, leaderCommit 0, checkIndex 0,
-	checkTerm 0, entries length 0
-2020/03/11 10:43:57 server0 sync with leader server2, leaderCommit 0, leader PL 0, leader PT 0, sync Result true, entities length 0, after sync log length 1, self commitIndex 0
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 server3 get heartbeat from server2, leader term 4, self term 4, is empty heartbeat: true
-2020/03/11 10:43:57 server3 sync with leader function, leaderCommit 0, checkIndex 0,
-	checkTerm 0, entries length 0
-2020/03/11 10:43:57 server3 sync with leader server2, leaderCommit 0, leader PL 0, leader PT 0, sync Result true, entities length 0, after sync log length 1, self commitIndex 0
-2020/03/11 10:43:57 Persist server2's state, data length 131
-2020/03/11 10:43:57 leader server2 get command, lastLogIndex 1, lastLogTerm 4
-2020/03/11 10:43:57 leader server2 get command, lastLogIndex 2, lastLogTerm 4
-2020/03/11 10:43:57 leader server2 get command, lastLogIndex 3, lastLogTerm 4
-2020/03/11 10:43:57 leader server2 get command, lastLogIndex 5, lastLogTerm 4
-2020/03/11 10:43:57 leader server2 get command, lastLogIndex 4, lastLogTerm 4
-2020/03/11 10:43:58 server2 heartbeat, term 4, leader lastLogIndex 5
-2020/03/11 10:43:58 server2 send heartbeat to server4, PT 0, PI 0
-2020/03/11 10:43:58 server2 send heartbeat to server1, PT 0, PI 0
-2020/03/11 10:43:58 server2 send heartbeat to server0, PT 0, PI 0, sync nextIndex 1, leader commitIndex 0
-2020/03/11 10:43:58 server2 send heartbeat to server3, PT 0, PI 0, sync nextIndex 1, leader commitIndex 0
-2020/03/11 10:43:58 server1 get heartbeat from server2, leader term 4, self term 4, is empty heartbeat: true
-2020/03/11 10:43:58 server1 sync with leader function, leaderCommit 0, checkIndex 0,
-	checkTerm 0, entries length 0
-2020/03/11 10:43:58 server1 sync with leader server2, leaderCommit 0, leader PL 0, leader PT 0, sync Result true, entities length 0, after sync log length 1, self commitIndex 0
-2020/03/11 10:43:58 Persist server2's state, data length 215
-2020/03/11 10:43:58 server4 get heartbeat from server2, leader term 4, self term 4, is empty heartbeat: true
-2020/03/11 10:43:58 server4 sync with leader function, leaderCommit 0, checkIndex 0,
-	checkTerm 0, entries length 0
-2020/03/11 10:43:58 server4 sync with leader server2, leaderCommit 0, leader PL 0, leader PT 0, sync Result true, entities length 0, after sync log length 1, self commitIndex 0
-2020/03/11 10:43:58 Persist server2's state, data length 215
-2020/03/11 10:43:58 server0 get heartbeat from server2, leader term 4, self term 4, is empty heartbeat: false
-2020/03/11 10:43:58 server0 sync with leader function, leaderCommit 0, checkIndex 0,
-	checkTerm 0, entries length 5
-2020/03/11 10:43:58 Persist server0's state, data length 215
-2020/03/11 10:43:58 Persist server0's state, data length 215
-2020/03/11 10:43:58 server0 sync with leader server2, leaderCommit 0, leader PL 0, leader PT 0, sync Result true, entities length 5, after sync log length 6, self commitIndex 0
-2020/03/11 10:43:58 leader server2 update matchIndex [5 0 5 0 0]
-2020/03/11 10:43:58 Persist server2's state, data length 215
-2020/03/11 10:43:58 server3 get heartbeat from server2, leader term 4, self term 4, is empty heartbeat: false
-2020/03/11 10:43:58 server3 sync with leader function, leaderCommit 0, checkIndex 0,
-	checkTerm 0, entries length 5
-2020/03/11 10:43:58 Persist server3's state, data length 215
-2020/03/11 10:43:58 Persist server3's state, data length 215
-2020/03/11 10:43:58 server3 sync with leader server2, leaderCommit 0, leader PL 0, leader PT 0, sync Result true, entities length 5, after sync log length 6, self commitIndex 0
-2020/03/11 10:43:58 leader server2 update matchIndex [5 0 5 5 0]
-2020/03/11 10:43:58 leader server2 apply log 1, commitIndex 5
-2020/03/11 10:43:58 leader server2 apply log 2, commitIndex 5
-2020/03/11 10:43:58 leader server2 apply log 3, commitIndex 5
-2020/03/11 10:43:58 leader server2 apply log 4, commitIndex 5
-2020/03/11 10:43:58 leader server2 apply log 5, commitIndex 5
-2020/03/11 10:43:58 Persist server2's state, data length 215
-2020/03/11 10:43:58 leader server2 get command, lastLogIndex 6, lastLogTerm 4
-2020/03/11 10:43:58 leader server2 get command, lastLogIndex 7, lastLogTerm 4
-2020/03/11 10:43:58 leader server2 get command, lastLogIndex 8, lastLogTerm 4
-2020/03/11 10:43:58 leader server2 get command, lastLogIndex 6, lastLogTerm 4
-2020/03/11 10:43:58 leader server2 get command, lastLogIndex 9, lastLogTerm 4
-2020/03/11 10:43:58 server2 heartbeat, term 4, leader lastLogIndex 9
-2020/03/11 10:43:58 server2 send heartbeat to server4, PT 0, PI 0, sync nextIndex 1, leader commitIndex 5
-2020/03/11 10:43:58 server2 send heartbeat to server0, PT 4, PI 5, sync nextIndex 6, leader commitIndex 5
-2020/03/11 10:43:58 server2 send heartbeat to server3, PT 4, PI 5, sync nextIndex 6, leader commitIndex 5
-2020/03/11 10:43:58 server2 send heartbeat to server1, PT 0, PI 0, sync nextIndex 1, leader commitIndex 5
-2020/03/11 10:43:58 server4 get heartbeat from server2, leader term 4, self term 4, is empty heartbeat: false
-2020/03/11 10:43:58 server4 sync with leader function, leaderCommit 5, checkIndex 0,
-	checkTerm 0, entries length 10
-2020/03/11 10:43:58 Persist server4's state, data length 304
-2020/03/11 10:43:58 server4 apply log 1
-2020/03/11 10:43:58 server4 apply log 2
-2020/03/11 10:43:58 server4 apply log 3
-2020/03/11 10:43:58 server4 apply log 4
-2020/03/11 10:43:58 server4 apply log 5
-2020/03/11 10:43:58 Persist server4's state, data length 304
-2020/03/11 10:43:58 server4 sync with leader server2, leaderCommit 5, leader PL 0, leader PT 0, sync Result true, entities length 10, after sync log length 11, self commitIndex 5
-2020/03/11 10:43:58 leader server2 update matchIndex [5 0 9 5 9]
-2020/03/11 10:43:58 Persist server2's state, data length 304
-2020/03/11 10:43:58 server1 get heartbeat from server2, leader term 4, self term 4, is empty heartbeat: false
-2020/03/11 10:43:58 server1 sync with leader function, leaderCommit 5, checkIndex 0,
-	checkTerm 0, entries length 10
-2020/03/11 10:43:58 Persist server1's state, data length 304
-2020/03/11 10:43:58 server1 apply log 1
-2020/03/11 10:43:58 server1 apply log 2
-2020/03/11 10:43:58 server1 apply log 3
-2020/03/11 10:43:58 server1 apply log 4
-2020/03/11 10:43:58 server1 apply log 5
-2020/03/11 10:43:58 Persist server1's state, data length 304
-2020/03/11 10:43:58 server1 sync with leader server2, leaderCommit 5, leader PL 0, leader PT 0, sync Result true, entities length 10, after sync log length 11, self commitIndex 5
-2020/03/11 10:43:58 leader server2 update matchIndex [5 9 9 5 9]
-2020/03/11 10:43:58 leader server2 apply log 6, commitIndex 9
-2020/03/11 10:43:58 leader server2 apply log 7, commitIndex 9
-2020/03/11 10:43:58 apply error: commit index=6 server=2 2 != server=2 201
-2020/03/11 10:43:58 leader server2 apply log 8, commitIndex 9
-exit status 1
-FAIL	_/Users/zhaolin/Documents/MIT6d824/6.824/src/raft	75.091s
+  ... Passed --   8.1  5  256  104350  246
+Test (2C): Figure 8 (unreliable) ...
+panic: runtime error: index out of range [715] with length 2
+
+goroutine 16211 [running]:
+_/Users/zhaolin/Documents/MIT6d824/6.824/src/raft.(*Raft).syncWithLeader(0xc000240480, 0x1, 0x2cb, 0x3f, 0x0, 0x0, 0x0, 0x8)
+	/Users/zhaolin/Documents/MIT6d824/6.824/src/raft/raft.go:615 +0x7af
+_/Users/zhaolin/Documents/MIT6d824/6.824/src/raft.(*Raft).AppendEntries(0xc000240480, 0xc000063c80, 0xc00035def0)
+	/Users/zhaolin/Documents/MIT6d824/6.824/src/raft/raft.go:237 +0x17a
+reflect.Value.call(0xc000072300, 0xc000104c88, 0x13, 0x11f73ae, 0x4, 0xc0001bbbb8, 0x3, 0x3, 0xc0001bba80, 0x10b898d, ...)
+	/usr/local/Cellar/go/1.13.4/libexec/src/reflect/value.go:460 +0x5f6
+reflect.Value.Call(0xc000072300, 0xc000104c88, 0x13, 0xc0001bbbb8, 0x3, 0x3, 0xc00035db20, 0x1, 0x1)
+	/usr/local/Cellar/go/1.13.4/libexec/src/reflect/value.go:321 +0xb4
+_/Users/zhaolin/Documents/MIT6d824/6.824/src/labrpc.(*Service).dispatch(0xc000305f00, 0x11f9d25, 0xd, 0x11ad5a0, 0xc000411b00, 0x11f9d20, 0x12, 0x1239a60, 0x11a1da0, 0xc0004eea00, ...)
+	/Users/zhaolin/Documents/MIT6d824/6.824/src/labrpc/labrpc.go:494 +0x682
+_/Users/zhaolin/Documents/MIT6d824/6.824/src/labrpc.(*Server).dispatch(0xc0003bf1c0, 0x11ad5a0, 0xc000411b00, 0x11f9d20, 0x12, 0x1239a60, 0x11a1da0, 0xc0004eea00, 0xe9, 0xf8, ...)
+	/Users/zhaolin/Documents/MIT6d824/6.824/src/labrpc/labrpc.go:418 +0x4a3
+_/Users/zhaolin/Documents/MIT6d824/6.824/src/labrpc.(*Network).processReq.func1(0xc0003bf1c0, 0x11ad5a0, 0xc000411b00, 0x11f9d20, 0x12, 0x1239a60, 0x11a1da0, 0xc0004eea00, 0xe9, 0xf8, ...)
+	/Users/zhaolin/Documents/MIT6d824/6.824/src/labrpc/labrpc.go:238 +0x60
+created by _/Users/zhaolin/Documents/MIT6d824/6.824/src/labrpc.(*Network).processReq
+	/Users/zhaolin/Documents/MIT6d824/6.824/src/labrpc/labrpc.go:237 +0x141
+exit status 2
+FAIL	_/Users/zhaolin/Documents/MIT6d824/6.824/src/raft	91.788s

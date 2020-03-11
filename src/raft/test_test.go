@@ -606,15 +606,15 @@ func TestPersist22C(t *testing.T) {
 	for iters := 0; iters < 5; iters++ {
 		cfg.one(10+index, servers, true)
 		index++
-
+		DPrintf("cfg commit 1")
 		leader1 := cfg.checkOneLeader()
 
 		cfg.disconnect((leader1 + 1) % servers)
 		cfg.disconnect((leader1 + 2) % servers)
-
+		DPrintf("cfg disconnect 2")
 		cfg.one(10+index, servers-2, true)
 		index++
-
+		DPrintf("cfg commit 2")
 		cfg.disconnect((leader1 + 0) % servers)
 		cfg.disconnect((leader1 + 3) % servers)
 		cfg.disconnect((leader1 + 4) % servers)
@@ -628,10 +628,10 @@ func TestPersist22C(t *testing.T) {
 
 		cfg.start1((leader1 + 3) % servers)
 		cfg.connect((leader1 + 3) % servers)
-
+		DPrintf("cfg reconnect")
 		cfg.one(10+index, servers-2, true)
 		index++
-
+		DPrintf("cfg commit 3")
 		cfg.connect((leader1 + 4) % servers)
 		cfg.connect((leader1 + 0) % servers)
 	}

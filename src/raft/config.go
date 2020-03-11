@@ -112,7 +112,6 @@ func (cfg *config) crash1(i int) {
 	// but copy old persister's content so that we always
 	// pass Make() the last persisted state.
 	if cfg.saved[i] != nil {
-		DPrintf("cfg read disk persist of server%d", i)
 		cfg.saved[i] = cfg.saved[i].Copy()
 	}
 
