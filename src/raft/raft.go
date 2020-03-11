@@ -530,7 +530,6 @@ func (rf *Raft) resetToLeader() {
 	rf.matchIndex = matchIndex
 	rf.syncServer = syncServer
 	rf.mu.Unlock()
-	rf.persist()
 }
 
 func (rf *Raft) syncWithServer(server, matchAtIndex int) {
@@ -641,9 +640,11 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 					}
 				}
 			}
+			rf.persist()
 		} else {
 			if rf.lastLogIndex > checkIndex {
 				rf.log = rf.log[:checkIndex+1]
+				rf.persist()
 			}
 		}
 
@@ -664,15 +665,16 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 				rf.lastApplied = i
 				DPrintf("server%d apply log %d", rf.me, rf.lastApplied)
 			}
+			rf.persist()
 		} else {
 			if rf.lastApplied+1 <= leaderCommit && rf.lastApplied+1 <= rf.lastLogIndex {
 				rf.applyChan <- rf.log[rf.lastApplied+1]
 				rf.lastApplied = rf.lastApplied + 1
 				DPrintf("server%d apply log %d", rf.me, rf.lastApplied)
+				rf.persist()
 			}
 		}
 		rf.mu.Unlock()
 	}
-	rf.persist()
 	return checkResult
 }
