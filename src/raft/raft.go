@@ -60,7 +60,6 @@ type Raft struct {
 	getVote         int
 	lastLogIndex    int
 	lastLogTerm     int
-	syncServer      []bool
 }
 
 // GetState return currentTerm and whether this server
@@ -180,6 +179,7 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		rf.mu.Unlock()
 		return
 	}
+
 	if rf.currentTerm < args.Term {
 		if rf.lastLogTerm > args.LastLogTerm {
 			rf.resetToFollower(args.Term, true)
@@ -196,15 +196,9 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	}
 	if rf.currentTerm == args.Term {
 		if rf.lastLogTerm > args.LastLogTerm {
-			rf.mu.Lock()
-			rf.timeRecord = time.Now()
-			rf.mu.Unlock()
 			return
 		}
 		if rf.lastLogTerm == args.LastLogTerm && rf.lastLogIndex > args.LastLogIndex {
-			rf.mu.Lock()
-			rf.timeRecord = time.Now()
-			rf.mu.Unlock()
 			return
 		}
 		if rf.votedFor == -1 || rf.votedFor == args.CandidateID {
@@ -223,7 +217,6 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	if rf.currentTerm > args.Term {
 		return
 	}
-	// if empty heart beat
 
 	DPrintf("server%d get heartbeat from server%d, leader term %d, self term %d, is empty heartbeat: %t",
 		rf.me, args.LeaderID, args.Term, rf.currentTerm, len(args.Entries) == 0)
@@ -288,7 +281,7 @@ func (rf *Raft) sendHeartBeat(server int) {
 	args.Term = rf.currentTerm
 
 	// if not sync with this server, send heartbeat with empty Entries
-	if !rf.syncServer[server] || rf.nextIndex[server]-1 == rf.lastLogIndex {
+	if rf.nextIndex[server]-1 == rf.lastLogIndex {
 		DPrintf("server%d send heartbeat to server%d, PT %d, PI %d",
 			rf.me, server, args.PrevLogTerm, args.PrevLogIndex)
 		ok := rf.peers[server].Call("Raft.AppendEntries", &args, &reply)
@@ -425,7 +418,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.lastApplied = 0
 	rf.nextIndex = []int{}
 	rf.matchIndex = []int{}
-	rf.syncServer = []bool{}
 	rf.timeRecord = time.Now()
 	rf.leaderID = -1
 	rf.getVote = 0
@@ -465,8 +457,8 @@ func (rf *Raft) electLeader() {
 }
 
 func (rf *Raft) heartBeat() {
-	DPrintf("server%d heartbeat, term %d, leader lastLogIndex %d",
-		rf.me, rf.currentTerm, rf.lastLogIndex)
+	DPrintf("server%d heartbeat, term %d, leader lastLogIndex %d, leaderCommit to %d",
+		rf.me, rf.currentTerm, rf.lastLogIndex, rf.commitIndex)
 	rf.mu.Lock()
 	rf.timeRecord = time.Now()
 	rf.mu.Unlock()
@@ -484,9 +476,9 @@ func (rf *Raft) resetToFollower(resetTerm int, fast bool) {
 		rf.persist()
 	}
 	if fast {
-		rf.electionTimeout = rand.Int63n(100) + 200
+		rf.electionTimeout = rand.Int63n(200) + 100
 	} else {
-		rf.electionTimeout = 400
+		rf.electionTimeout = rand.Int63n(300) + 300
 	}
 	rf.votedFor = -1
 	rf.state = "follower"
@@ -518,17 +510,13 @@ func (rf *Raft) resetToLeader() {
 	rf.electionTimeout = 100
 	nextIndex := []int{}
 	matchIndex := []int{}
-	syncServer := []bool{}
 	for range rf.peers {
 		nextIndex = append(nextIndex, rf.lastLogIndex+1)
 		matchIndex = append(matchIndex, 0)
-		syncServer = append(syncServer, false)
 	}
 	matchIndex[rf.me] = rf.lastLogIndex
-	syncServer[rf.me] = true
 	rf.nextIndex = nextIndex
 	rf.matchIndex = matchIndex
-	rf.syncServer = syncServer
 	rf.mu.Unlock()
 }
 
@@ -557,7 +545,6 @@ func (rf *Raft) syncWithServer(server, matchAtIndex int) {
 		}
 	}
 	rf.nextIndex[server] = matchAtIndex + 1
-	rf.syncServer[server] = true
 	rf.mu.Unlock()
 	rf.persist()
 }
@@ -610,12 +597,23 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 	if checkTerm > rf.lastLogTerm || checkIndex > rf.lastLogIndex {
 		DPrintf("check failed because of checkTerm %d > rf.lastLogTerm %d || checkIndex %d > rf.lastLogIndex %d, self commitIndex %d, self lastLogIndex %d",
 			checkTerm, rf.lastLogTerm, checkIndex, rf.lastLogIndex, rf.commitIndex, rf.lastLogIndex)
+		if checkIndex < rf.lastLogIndex && rf.log[checkIndex].CommandTerm != checkTerm {
+			DPrintf("check failed because rf.log[checkIndex].CommandTerm != checkTerm")
+			rf.mu.Lock()
+			rf.log = rf.log[:rf.commitIndex+1]
+			rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
+			rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
+			rf.mu.Unlock()
+			rf.persist()
+		}
 		return checkResult
 	}
 	if rf.log[checkIndex].CommandTerm != checkTerm {
 		DPrintf("check failed because rf.log[checkIndex].CommandTerm != checkTerm")
 		rf.mu.Lock()
 		rf.log = rf.log[:rf.commitIndex+1]
+		rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
+		rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
 		rf.mu.Unlock()
 		rf.persist()
 		return checkResult
@@ -626,19 +624,15 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 		// find a match point
 		if len(entries) > 0 {
 			copyStartPoint := entries[0].CommandIndex
-			copyEndPoint := rf.lastLogIndex
 
 			if copyStartPoint > rf.lastLogIndex {
 				for _, v := range entries {
 					rf.log = append(rf.log, v)
 				}
 			} else {
-				for k, v := range entries {
-					if v.CommandIndex <= copyEndPoint {
-						rf.log[copyStartPoint+k] = v
-					} else {
-						rf.log = append(rf.log, v)
-					}
+				rf.log = rf.log[:copyStartPoint]
+				for _, v := range entries {
+					rf.log = append(rf.log, v)
 				}
 			}
 			rf.persist()
@@ -652,7 +646,16 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 		rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
 		rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
 		rf.commitIndex = leaderCommit
+
 		if len(entries) > 0 {
+			DPrintf("server%d apply log, total log %d, detail: %v", rf.me, len(rf.log), rf.log)
+			for i := rf.lastApplied + 1; i <= leaderCommit; i++ {
+				rf.applyChan <- rf.log[i]
+				rf.lastApplied = i
+				DPrintf("server%d apply log %d", rf.me, rf.lastApplied)
+			}
+			rf.persist()
+		} else if rf.lastLogIndex == checkIndex && rf.lastLogTerm == checkTerm {
 			DPrintf("server%d apply log, total log %d, detail: %v", rf.me, len(rf.log), rf.log)
 			for i := rf.lastApplied + 1; i <= leaderCommit; i++ {
 				rf.applyChan <- rf.log[i]
@@ -669,6 +672,7 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 				rf.persist()
 			}
 		}
+
 		rf.mu.Unlock()
 	}
 	return checkResult
