@@ -597,15 +597,6 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 	if checkTerm > rf.lastLogTerm || checkIndex > rf.lastLogIndex {
 		DPrintf("check failed because of checkTerm %d > rf.lastLogTerm %d || checkIndex %d > rf.lastLogIndex %d, self commitIndex %d, self lastLogIndex %d",
 			checkTerm, rf.lastLogTerm, checkIndex, rf.lastLogIndex, rf.commitIndex, rf.lastLogIndex)
-		if checkIndex < rf.lastLogIndex && rf.log[checkIndex].CommandTerm != checkTerm {
-			DPrintf("check failed because rf.log[checkIndex].CommandTerm != checkTerm")
-			rf.mu.Lock()
-			rf.log = rf.log[:rf.commitIndex+1]
-			rf.lastLogIndex = rf.log[len(rf.log)-1].CommandIndex
-			rf.lastLogTerm = rf.log[len(rf.log)-1].CommandTerm
-			rf.mu.Unlock()
-			rf.persist()
-		}
 		return checkResult
 	}
 	if rf.log[checkIndex].CommandTerm != checkTerm {
