@@ -398,6 +398,7 @@ func (rf *Raft) killed() bool {
 //
 func Make(peers []*labrpc.ClientEnd, me int,
 	persister *Persister, applyCh chan ApplyMsg) *Raft {
+	rand.Seed(50 + int64(me)*10)
 	rf := &Raft{}
 	rf.peers = peers
 	rf.persister = persister
