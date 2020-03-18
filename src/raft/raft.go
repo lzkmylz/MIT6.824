@@ -126,8 +126,12 @@ func (rf *Raft) readPersist(data []byte) {
 	d.Decode(&rf.log)
 	d.Decode(&rf.commitIndex)
 	d.Decode(&rf.lastApplied)
-	DPrintf("server%d read from persister, currentTerm %d, votedFor %d, log length %d, log detail: %v",
-		rf.me, rf.currentTerm, rf.votedFor, len(rf.log), rf.log)
+	for i := 1; i <= rf.lastApplied; i++ {
+		DPrintf("server%d reapply log %d", rf.me, i)
+		rf.applyChan <- rf.log[i]
+	}
+	DPrintf("server%d read from persister, currentTerm %d, votedFor %d, log length %d",
+		rf.me, rf.currentTerm, rf.votedFor, len(rf.log))
 }
 
 //
@@ -537,7 +541,6 @@ func (rf *Raft) syncWithServer(server, matchAtIndex int) {
 
 		if majority > rf.commitIndex {
 			rf.commitIndex = majority
-			DPrintf("server%d apply log, total log %d, detail: %v", rf.me, len(rf.log), rf.log)
 			for i := rf.lastApplied + 1; i <= majority; i++ {
 				DPrintf("leader server%d apply log %d, commitIndex %d", rf.me, i, rf.commitIndex)
 				rf.applyChan <- rf.log[i]
@@ -640,7 +643,6 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 		rf.commitIndex = leaderCommit
 
 		if len(entries) > 0 {
-			DPrintf("server%d apply log, total log %d, detail: %v", rf.me, len(rf.log), rf.log)
 			for i := rf.lastApplied + 1; i <= leaderCommit; i++ {
 				rf.applyChan <- rf.log[i]
 				rf.lastApplied = i
@@ -648,7 +650,6 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 			}
 			rf.persist()
 		} else if rf.lastLogIndex == checkIndex && rf.lastLogTerm == checkTerm {
-			DPrintf("server%d apply log, total log %d, detail: %v", rf.me, len(rf.log), rf.log)
 			for i := rf.lastApplied + 1; i <= leaderCommit; i++ {
 				rf.applyChan <- rf.log[i]
 				rf.lastApplied = i
@@ -657,7 +658,6 @@ func (rf *Raft) syncWithLeader(leaderCommit, checkIndex, checkTerm int, entries 
 			rf.persist()
 		} else {
 			if rf.lastApplied+1 <= leaderCommit && rf.lastApplied+1 <= rf.lastLogIndex {
-				DPrintf("server%d apply log, total log %d, detail: %v", rf.me, len(rf.log), rf.log)
 				rf.applyChan <- rf.log[rf.lastApplied+1]
 				rf.lastApplied = rf.lastApplied + 1
 				DPrintf("server%d apply log %d", rf.me, rf.lastApplied)

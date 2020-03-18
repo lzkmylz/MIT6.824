@@ -11,7 +11,7 @@ import (
 	"../raft"
 )
 
-const Debug = 1
+const Debug = 0
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 	if Debug > 0 {
@@ -170,20 +170,19 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	// You may need initialization code here.
 
 	kv.applyCh = make(chan raft.ApplyMsg)
-	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
 	// You may need initialization code here.
 	kv.database = make(map[string]string)
 	kv.ack = make(map[int64]int)
 	kv.messages = make(map[int]chan Result)
 	go kv.Update()
+	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 	return kv
 }
 
 func (kv *KVServer) Update() {
 	for {
 		msg := <-kv.applyCh
-		DPrintf("%v", msg)
 		request := msg.Command.(Op)
 		result := Result{
 			opType:    request.OpType,
@@ -216,7 +215,7 @@ func (kv *KVServer) Update() {
 		if _, ok := kv.messages[msg.CommandIndex]; !ok {
 			kv.messages[msg.CommandIndex] = make(chan Result, 1)
 		}
-		DPrintf("Key %s, Result: %v", result.Key, result)
+		DPrintf("server%d process apply log %v", kv.me, result)
 		kv.messages[msg.CommandIndex] <- result
 		kv.mu.Unlock()
 	}
